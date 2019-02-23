@@ -43,11 +43,15 @@ namespace ADFSDump
 
             ADSearcher.GetPrivKey(arguments);
 
-            DatabaseReader reader = new DatabaseReader();
-            Dictionary<string, RelyingParty>.ValueCollection rps = reader.readConfigurationDB();
+            
+            Dictionary<string, RelyingParty>.ValueCollection rps = DatabaseReader.ReadConfigurationDB();
+            if (rps == null)
+            {
+                System.Environment.Exit(1);
+            }
             foreach(var relyingparty in rps)
             {
-                Console.WriteLine(relyingparty);
+                Console.WriteLine(string.Format("[-] {0}", relyingparty));
             }
 
         }

@@ -36,7 +36,8 @@ namespace ADFSDump.ActiveDirectory
                 }
             }
 
-            Console.WriteLine(string.Format("Domain is {0}", domain));
+            Console.WriteLine("## Extracting Private Key from Active Directory Store");
+            Console.WriteLine(string.Format("[-] Domain is {0}", domain));
             string[] domainParts = domain.Split('.');
             List<String> searchBase = new List<String>{ "CN=ADFS", "CN=Microsoft", "CN=Program Data" };
             foreach( string part in domainParts)
@@ -58,7 +59,7 @@ namespace ADFSDump.ActiveDirectory
                         {
                             byte[] privateKey = (byte[])resEnt.Properties["thumbnailphoto"][0];
                             string convertedPrivateKey = BitConverter.ToString(privateKey);
-                            Console.WriteLine("Private Key: {0}\r\n\r\n", convertedPrivateKey);
+                            Console.WriteLine("[-] Private Key: {0}\r\n\r\n", convertedPrivateKey);
                         }
 
                     }
