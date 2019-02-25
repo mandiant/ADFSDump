@@ -49,7 +49,7 @@ namespace ADFSDump.RelyingPartyTrust
         public string StrongAuthRules
         { get; set; }
 
-        public string getSignInProtocol()
+        public string GetSignInProtocol()
         {
             if (IsSaml)
             {
@@ -67,40 +67,40 @@ namespace ADFSDump.RelyingPartyTrust
 
         public override string ToString()
         {
-            string baseMsg = string.Format(@"
-{0}
+            string baseMsg = $@"
+{Name}
  ==================
-    Enabled: {1}
-    Sign-In Protocol: {2}
-    Sign-In Endpoint: {3}
-    Signature Algorithm: {4}
-    Identity: {5}
-    Acess Policy: {6}
+    Enabled: {IsEnabled}
+    Sign-In Protocol: {GetSignInProtocol()}
+    Sign-In Endpoint: {FederationEndpoint}
+    Signature Algorithm: {SignatureAlgorithm}
+    Identity: {Identity}
+    Access Policy: {AccessPolicy}
     
-    Issuance Rules: {7}", Name, IsEnabled, getSignInProtocol(), FederationEndpoint, SignatureAlgorithm, Identity, AccessPolicy, IssuanceRules);
+    Issuance Rules: {IssuanceRules}";
             if (!string.IsNullOrEmpty(EncryptionCert))
             {
-                string encryption = string.Format("Encryption Certificate: {0}\r\n\r\n", EncryptionCert);
+                string encryption = $"Encryption Certificate: {EncryptionCert}\r\n\r\n";
                 baseMsg += encryption;
             }
             if (!string.IsNullOrEmpty(AuthRules))
             {
-                string auth = string.Format("Authorization Rules: {0}\r\n\r\n", AuthRules);
+                string auth = $"Authorization Rules: {AuthRules}\r\n\r\n";
                 baseMsg += auth;
             }
             if (!string.IsNullOrEmpty(ActAsAuthRules))
             {
-                string actAsAuth = string.Format("ActAs Authorization Rules: {0}\r\n\r\n", ActAsAuthRules);
+                string actAsAuth = $"ActAs Authorization Rules: {ActAsAuthRules}\r\n\r\n";
                 baseMsg += actAsAuth;
             }
             if (!string.IsNullOrEmpty(OnBehalfAuthRules))
             {
-                string onBehalf = string.Format("OnBehalf Authorization Rules: {0}\r\n\r\n", OnBehalfAuthRules);
+                string onBehalf = $"OnBehalf Authorization Rules: {OnBehalfAuthRules}\r\n\r\n";
                 baseMsg += onBehalf;
             }
             if (!string.IsNullOrEmpty(StrongAuthRules))
             {
-                string strongAuth = string.Format("StrongAuth Authorization Rules: {0}\r\n\r\n", StrongAuthRules);
+                string strongAuth = $"StrongAuth Authorization Rules: {StrongAuthRules}\r\n\r\n";
                 baseMsg += strongAuth;
             }
             return baseMsg;

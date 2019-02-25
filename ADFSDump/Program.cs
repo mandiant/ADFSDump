@@ -8,7 +8,7 @@ using ADFSDump.ActiveDirectory;
 namespace ADFSDump
 {
     
-    public class Program
+    class Program
     {
         private static Dictionary<string, string> ParseArgs(string[] args)
         {
@@ -17,7 +17,7 @@ namespace ADFSDump
             {
                 foreach(string argument in args)
                 {
-                    var index = argument.IndexOf(":");
+                    var index = argument.IndexOf(":", StringComparison.Ordinal);
                     if (index > 0)
                     {
                         arguments[argument.Substring(0, index)] = argument.Substring(index + 1);
@@ -25,7 +25,7 @@ namespace ADFSDump
                 }
             } catch (Exception e)
             {
-                Console.WriteLine(string.Format("!!! Exception parsing args: {0}", e));
+                Console.WriteLine($"!!! Exception parsing args: {e}");
             }
             return arguments;
         }
@@ -35,23 +35,20 @@ namespace ADFSDump
             Info.ShowInfo();
 
             Dictionary<string, string> arguments = null;
-            if (args.Length > 0)
-            {
-                arguments = ParseArgs(args);
-            }
-            
+            if (args.Length > 0) arguments = ParseArgs(args);
+
 
             ADSearcher.GetPrivKey(arguments);
 
             
-            Dictionary<string, RelyingParty>.ValueCollection rps = DatabaseReader.ReadConfigurationDB();
+            Dictionary<string, RelyingParty>.ValueCollection rps = DatabaseReader.ReadConfigurationDb();
             if (rps == null)
             {
-                System.Environment.Exit(1);
+                Environment.Exit(1);
             }
             foreach(var relyingparty in rps)
             {
-                Console.WriteLine(string.Format("[-] {0}", relyingparty));
+                Console.WriteLine($"[-] {relyingparty}");
             }
 
         }

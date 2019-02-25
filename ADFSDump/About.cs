@@ -1,6 +1,5 @@
 ﻿using System;
 
-
 namespace ADFSDump.About
 {
     public static class Info
