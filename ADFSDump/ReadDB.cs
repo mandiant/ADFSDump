@@ -22,22 +22,22 @@ namespace ADFSDump.ReadDB
         public static Dictionary<string, RelyingParty>.ValueCollection ReadConfigurationDb()
         {
             SqlConnection conn = null;
+            string connectionString = "";
+            var os = Environment.OSVersion;
+            if ((os.Version.Major == 6 && os.Version.Minor <= 1) || os.Version.Major < 6)
+            {
+                // we are on 2008 R2 or below which means legacy
+                connectionString = WidConnectionStringLegacy;
+            }
+            else
+            {
+                connectionString = WidConnectionString;
+            }
             try
             {
-                conn = new SqlConnection(WidConnectionString);
+                conn = new SqlConnection(connectionString);
                 conn.Open();
-            } catch (SqlException)
-            {
-                try
-                {
-                    conn = new SqlConnection(WidConnectionStringLegacy);
-                    conn.Open();
-                } catch(SqlException x)
-                {
-                    Console.WriteLine($"!!! Error connecting to WID. Are you sure AD FS is configured for WID?\n {x}");
-                }
-                
-            } catch (Exception e)
+            }  catch (Exception e)
             {
                 Console.WriteLine($"!!! Error connecting to WID.\n {e}");
                 Environment.Exit(1);
@@ -189,12 +189,22 @@ namespace ADFSDump.ReadDB
                 if (rps.Keys.Contains(scopeId) && !string.IsNullOrEmpty(rule))
                 {
 
-                    int ruleType = (int)reader["PolicyUsage"];
-                    if (ruleType == 4) { rps[scopeId].StrongAuthRules = rule; }
-                    else if (ruleType == 3) { rps[scopeId].OnBehalfAuthRules = rule; }
-                    else if (ruleType == 2) { rps[scopeId].ActAsAuthRules = rule; }
-                    else if (ruleType == 1) { rps[scopeId].AuthRules = rule; }
-                    else { rps[scopeId].IssuanceRules = rule; }
+                    PolicyType ruleType = (PolicyType)reader["PolicyUsage"];
+                    switch (ruleType)
+                    {
+                        case PolicyType.StrongAuthAuthorizationRules:
+                            rps[scopeId].StrongAuthRules = rule;
+                            break;
+                        case PolicyType.OnBehalfAuthorizationRules:
+                            rps[scopeId].OnBehalfAuthRules = rule;
+                            break;
+                        case PolicyType.ActAsAuthorizationRules:
+                            rps[scopeId].AuthRules = rule;
+                            break;
+                        case PolicyType.IssuanceRules:
+                            rps[scopeId].IssuanceRules = rule;
+                            break;
+                    }  
 
                 }
 

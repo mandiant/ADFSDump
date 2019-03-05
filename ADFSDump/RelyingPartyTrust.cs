@@ -2,6 +2,15 @@
 
 namespace ADFSDump.RelyingPartyTrust
 {
+    public enum PolicyType
+    {
+        IssuanceRules,
+        AuthorizationRules,
+        ActAsAuthorizationRules,
+        OnBehalfAuthorizationRules,
+        StrongAuthAuthorizationRules
+    }
+
     public class RelyingParty
     {
         public string Id
