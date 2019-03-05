@@ -19,6 +19,7 @@ namespace ADFSDump.ActiveDirectory
             {
                 //no domain or server given, try to find it ourselves
                 domain = System.DirectoryServices.ActiveDirectory.Domain.GetCurrentDomain().Name;
+                searchString = "LDAP://";
             }
             else
             {
