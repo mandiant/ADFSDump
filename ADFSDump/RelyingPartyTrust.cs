@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace ADFSDump.RelyingPartyTrust
 {
@@ -13,6 +14,22 @@ namespace ADFSDump.RelyingPartyTrust
 
     public class RelyingParty
     {
+        private Dictionary<int, string> SamlResponseSignatureTypes = new Dictionary<int, string>()
+        {
+            {
+                0, "None"
+            },
+            {
+                1, "Assertion"
+            },
+            {
+                2, "Message"
+            },
+            {
+                3, "Both"
+            }
+        };
+
         public string Id
         { get; set; }
 
@@ -74,6 +91,11 @@ namespace ADFSDump.RelyingPartyTrust
             }
         }
 
+        public int SamlResponseSignatureType
+        { get; set; }
+
+        public string AccessPolicyParam { get; set; }
+
         public override string ToString()
         {
             string baseMsg = $@"
@@ -83,8 +105,10 @@ namespace ADFSDump.RelyingPartyTrust
     Sign-In Protocol: {GetSignInProtocol()}
     Sign-In Endpoint: {FederationEndpoint}
     Signature Algorithm: {SignatureAlgorithm}
+    SamlResponseSignatureType: {SamlResponseSignatureType};
     Identity: {Identity}
     Access Policy: {AccessPolicy}
+    Access Policy Parameter: {AccessPolicyParam}
     
     Issuance Rules: {IssuanceRules}";
             if (!string.IsNullOrEmpty(EncryptionCert))

@@ -13,11 +13,15 @@ namespace ADFSDump.ReadDB
         private const string WidConnectionStringLegacy = "Data Source=np:\\\\.\\pipe\\MSSQL$MICROSOFT##SSEE\\sql\\query";
         private const string ReadEncryptedPfxQuery = "SELECT ServiceSettingsData from {0}.IdentityServerPolicy.ServiceSettings";
         private static readonly string[] BuiltInScopes = { "SelfScope", "ProxyTrustProvisionRelyingParty", "Device Registration Service", "UserInfo", "PRTUpdateRp", "Windows Hello - Certificate Provisioning Service", "urn:AppProxy:com" };
-        private const string ReadScopePolicies = "SELECT SCOPES.ScopeId,SCOPES.Name,SCOPES.WSFederationPassiveEndpoint,SCOPES.Enabled,SCOPES.SignatureAlgorithm,SCOPES.EntityId,SCOPES.EncryptionCertificate,SCOPES.MustEncryptNameId, SAML.Binding, SAML.Location,POLICYTEMPLATE.name, POLICYTEMPLATE.PolicyMetadata, SCOPEIDS.IdentityData FROM {0}.IdentityServerPolicy.Scopes SCOPES LEFT OUTER JOIN {0}.IdentityServerPolicy.ScopeAssertionConsumerServices SAML ON SCOPES.ScopeId = SAML.ScopeId LEFT OUTER JOIN {0}.IdentityServerPolicy.PolicyTemplates POLICYTEMPLATE ON SCOPES.PolicyTemplateId = POLICYTEMPLATE.PolicyTemplateId LEFT OUTER JOIN {0}.IdentityServerPolicy.ScopeIdentities SCOPEIDS ON SCOPES.ScopeId = SCOPEIDS.ScopeId";
+        private const string ReadScopePolicies = "SELECT SCOPES.ScopeId,SCOPES.Name,SCOPES.WSFederationPassiveEndpoint,SCOPES.Enabled,SCOPES.SignatureAlgorithm,SCOPES.EntityId,SCOPES.EncryptionCertificate,SCOPES.MustEncryptNameId, SCOPES.SamlResponseSignatureType, SCOPES.ParameterInterface, SAML.Binding, SAML.Location,POLICYTEMPLATE.name, POLICYTEMPLATE.PolicyMetadata, POLICYTEMPLATE.InterfaceVersion, SCOPEIDS.IdentityData FROM {0}.IdentityServerPolicy.Scopes SCOPES LEFT OUTER JOIN {0}.IdentityServerPolicy.ScopeAssertionConsumerServices SAML ON SCOPES.ScopeId = SAML.ScopeId LEFT OUTER JOIN {0}.IdentityServerPolicy.PolicyTemplates POLICYTEMPLATE ON SCOPES.PolicyTemplateId = POLICYTEMPLATE.PolicyTemplateId LEFT OUTER JOIN {0}.IdentityServerPolicy.ScopeIdentities SCOPEIDS ON SCOPES.ScopeId = SCOPEIDS.ScopeId";
+        private const string ReadScopePoliciesLegacy = "SELECT SCOPES.ScopeId,SCOPES.Name,SCOPES.WSFederationPassiveEndpoint,SCOPES.Enabled,SCOPES.SignatureAlgorithm,SCOPES.EntityId,SCOPES.EncryptionCertificate,SCOPES.MustEncryptNameId, ,SCOPES.SamlResponseSignatureType, SAML.Binding, SAML.Location, SCOPEIDS.IdentityData FROM {0}.IdentityServerPolicy.Scopes SCOPES LEFT OUTER JOIN {0}.IdentityServerPolicy.ScopeAssertionConsumerServices SAML ON SCOPES.ScopeId = SAML.ScopeId LEFT OUTER JOIN {0}.IdentityServerPolicy.ScopeIdentities SCOPEIDS ON SCOPES.ScopeId = SCOPEIDS.ScopeId";
         private const string ReadRules = "Select SCOPE.ScopeId, SCOPE.name, POLICIES.PolicyData,POLICIES.PolicyType, POLICIES.PolicyUsage FROM {0}.IdentityServerPolicy.Scopes SCOPE INNER JOIN {0}.IdentityServerPolicy.ScopePolicies SCOPEPOLICIES ON SCOPE.ScopeId = SCOPEPOLICIES.ScopeId INNER JOIN {0}.IdentityServerPolicy.Policies POLICIES ON SCOPEPOLICIES.PolicyId = POLICIES.PolicyId";
         private const string ReadDatabases = "SELECT name FROM sys.databases";
         private const string AdfsConfigTable = "AdfsConfiguration";
-
+        private const string Adfs2012R2 = "AdfsConfiguration";
+        private const string Adfs2016 = "AdfsConfigurationV3";
+        private const string Adfs2019 = "AdfsConfigurationV4";
+        
 
         public static Dictionary<string, RelyingParty>.ValueCollection ReadConfigurationDb()
         {
@@ -72,7 +76,6 @@ namespace ADFSDump.ReadDB
                 string dbName = (string)reader["name"];
                 if (dbName.Contains(AdfsConfigTable))
                 {
-                    Console.WriteLine($"[-] Identified AD FS version: {dbName}\n");
                     reader.Close();
                     return dbName;
                 }
@@ -120,7 +123,26 @@ namespace ADFSDump.ReadDB
             // enumerate scopes and policies
             try
             {
-                string readScopePolicies = string.Format(ReadScopePolicies, dbName);
+                string readScopePolicies = "";
+                switch (dbName)
+                {
+                    case Adfs2012R2:
+                        Console.WriteLine("[-] Detected AD FS 2012");
+                        readScopePolicies = string.Format(ReadScopePoliciesLegacy, dbName);
+                        break;
+                    case Adfs2016:
+                        Console.WriteLine("[-] Detected AD FS 2016");
+                        readScopePolicies = string.Format(ReadScopePolicies, dbName);
+                        break;
+                    case Adfs2019:
+                        Console.WriteLine("[-] Detected AD FS 2019");
+                        readScopePolicies = string.Format(ReadScopePolicies, dbName);
+                        break;
+                    default:
+                        Console.WriteLine("!!! Couldn't determine AD FS version. Quitting");
+                        break;
+                }
+                
                 SqlCommand cmd = new SqlCommand(readScopePolicies, conn);
                 reader = cmd.ExecuteReader();
             }
@@ -142,7 +164,16 @@ namespace ADFSDump.ReadDB
                     RelyingParty rp = new RelyingParty { Name = name, Id = scopeId };
                     rp.IsEnabled = (bool)reader["Enabled"];
                     rp.SignatureAlgorithm = (string)reader["SignatureAlgorithm"];
-                    rp.AccessPolicy = (string)reader["PolicyMetadata"];
+                    if (dbName != Adfs2012R2)
+                    {
+                        rp.AccessPolicy = (string)reader["PolicyMetadata"];
+                        if (!reader.IsDBNull(9))
+                        {
+                            rp.AccessPolicyParam = (string)reader["ParameterInterface"];
+                        }
+ 
+                    }
+                    
                     rp.Identity = (string)reader["IdentityData"];
 
                     if (!reader.IsDBNull(2))
@@ -163,6 +194,7 @@ namespace ADFSDump.ReadDB
                         rp.EncryptionCert = (string)reader["EncryptionCertificate"];
                     }
 
+                    rp.SamlResponseSignatureType = (int) reader["SamlResponseSignatureType"];
                     rps[scopeId] = rp;
                     
                 }
