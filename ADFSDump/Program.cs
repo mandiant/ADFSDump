@@ -23,9 +23,10 @@ namespace ADFSDump
                         arguments[argument.Substring(0, index)] = argument.Substring(index + 1);
                     }
                 }
-            } catch (Exception e)
+            } catch (Exception)
             {
-                Console.WriteLine($"!!! Exception parsing args: {e}");
+               Info.ShowHelp();
+               Environment.Exit(1);
             }
             return arguments;
         }
@@ -39,8 +40,8 @@ namespace ADFSDump
 
 
             ADSearcher.GetPrivKey(arguments);
+   
 
-            
             Dictionary<string, RelyingParty>.ValueCollection rps = DatabaseReader.ReadConfigurationDb();
             if (rps == null)
             {

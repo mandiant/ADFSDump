@@ -14,7 +14,7 @@ namespace ADFSDump.ReadDB
         private const string ReadEncryptedPfxQuery = "SELECT ServiceSettingsData from {0}.IdentityServerPolicy.ServiceSettings";
         private static readonly string[] BuiltInScopes = { "SelfScope", "ProxyTrustProvisionRelyingParty", "Device Registration Service", "UserInfo", "PRTUpdateRp", "Windows Hello - Certificate Provisioning Service", "urn:AppProxy:com" };
         private const string ReadScopePolicies = "SELECT SCOPES.ScopeId,SCOPES.Name,SCOPES.WSFederationPassiveEndpoint,SCOPES.Enabled,SCOPES.SignatureAlgorithm,SCOPES.EntityId,SCOPES.EncryptionCertificate,SCOPES.MustEncryptNameId, SCOPES.SamlResponseSignatureType, SCOPES.ParameterInterface, SAML.Binding, SAML.Location,POLICYTEMPLATE.name, POLICYTEMPLATE.PolicyMetadata, POLICYTEMPLATE.InterfaceVersion, SCOPEIDS.IdentityData FROM {0}.IdentityServerPolicy.Scopes SCOPES LEFT OUTER JOIN {0}.IdentityServerPolicy.ScopeAssertionConsumerServices SAML ON SCOPES.ScopeId = SAML.ScopeId LEFT OUTER JOIN {0}.IdentityServerPolicy.PolicyTemplates POLICYTEMPLATE ON SCOPES.PolicyTemplateId = POLICYTEMPLATE.PolicyTemplateId LEFT OUTER JOIN {0}.IdentityServerPolicy.ScopeIdentities SCOPEIDS ON SCOPES.ScopeId = SCOPEIDS.ScopeId";
-        private const string ReadScopePoliciesLegacy = "SELECT SCOPES.ScopeId,SCOPES.Name,SCOPES.WSFederationPassiveEndpoint,SCOPES.Enabled,SCOPES.SignatureAlgorithm,SCOPES.EntityId,SCOPES.EncryptionCertificate,SCOPES.MustEncryptNameId, ,SCOPES.SamlResponseSignatureType, SAML.Binding, SAML.Location, SCOPEIDS.IdentityData FROM {0}.IdentityServerPolicy.Scopes SCOPES LEFT OUTER JOIN {0}.IdentityServerPolicy.ScopeAssertionConsumerServices SAML ON SCOPES.ScopeId = SAML.ScopeId LEFT OUTER JOIN {0}.IdentityServerPolicy.ScopeIdentities SCOPEIDS ON SCOPES.ScopeId = SCOPEIDS.ScopeId";
+        private const string ReadScopePoliciesLegacy = "SELECT SCOPES.ScopeId,SCOPES.Name,SCOPES.WSFederationPassiveEndpoint,SCOPES.Enabled,SCOPES.SignatureAlgorithm,SCOPES.EntityId,SCOPES.EncryptionCertificate,SCOPES.MustEncryptNameId,SCOPES.SamlResponseSignatureType, SAML.Binding, SAML.Location, SCOPEIDS.IdentityData FROM {0}.IdentityServerPolicy.Scopes SCOPES LEFT OUTER JOIN {0}.IdentityServerPolicy.ScopeAssertionConsumerServices SAML ON SCOPES.ScopeId = SAML.ScopeId LEFT OUTER JOIN {0}.IdentityServerPolicy.ScopeIdentities SCOPEIDS ON SCOPES.ScopeId = SCOPEIDS.ScopeId";
         private const string ReadRules = "Select SCOPE.ScopeId, SCOPE.name, POLICIES.PolicyData,POLICIES.PolicyType, POLICIES.PolicyUsage FROM {0}.IdentityServerPolicy.Scopes SCOPE INNER JOIN {0}.IdentityServerPolicy.ScopePolicies SCOPEPOLICIES ON SCOPE.ScopeId = SCOPEPOLICIES.ScopeId INNER JOIN {0}.IdentityServerPolicy.Policies POLICIES ON SCOPEPOLICIES.PolicyId = POLICIES.PolicyId";
         private const string ReadDatabases = "SELECT name FROM sys.databases";
         private const string AdfsConfigTable = "AdfsConfiguration";
@@ -44,7 +44,7 @@ namespace ADFSDump.ReadDB
             }  catch (Exception e)
             {
                 Console.WriteLine($"!!! Error connecting to WID.\n {e}");
-                Environment.Exit(1);
+                return null;
             }
             
             string adfsVersion = GetAdfsVersion(conn);
@@ -70,6 +70,7 @@ namespace ADFSDump.ReadDB
             } catch (Exception e)
             {
                 Console.WriteLine($"!! Exception connecting to WID: {e}");
+                return null;
             }
             while (reader.Read())
             {
@@ -99,6 +100,7 @@ namespace ADFSDump.ReadDB
             } catch (Exception e)
             {
                 Console.WriteLine("!!! Exception: {0}", e);
+                return null;
             }
 
             Console.WriteLine("## Reading Encrypted Signing Key from Database");
@@ -149,7 +151,7 @@ namespace ADFSDump.ReadDB
             catch (Exception e)
             {
                 Console.WriteLine("!!! Exception: {0}", e);
-                Environment.Exit(1);
+                return null;
             }
 
             Console.WriteLine("## Reading Relying Party Trust Information from Database");
@@ -210,7 +212,7 @@ namespace ADFSDump.ReadDB
             catch( Exception e)
             {
                 Console.WriteLine("!!! Exception: {0}", e);
-                Environment.Exit(1);
+                return null;
             }
 
             while (reader.Read())

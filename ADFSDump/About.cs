@@ -14,5 +14,25 @@ namespace ADFSDump.About
             Console.WriteLine("                                              /_/      ");
             Console.WriteLine("\r\n");
         }
+
+        public static void ShowHelp()
+        {
+            string Help = @"
+ADFSDump
+
+Dump all sorts of AD FS related goodies.
+
+Arguments:
+    /domain: The FQDN of the domain
+    /server: The FQDN of the domain controller to connect to
+
+Requirements:
+    Must be run locally on an AD FS server. Preferably the primary
+    Assumes that AD FS is configured to use WID rather than a dedicated SQL server
+    Must be run using the AD FS service account
+";
+            Console.WriteLine(Help);
+        }
     }
+
 }
