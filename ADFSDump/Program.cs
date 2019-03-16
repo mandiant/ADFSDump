@@ -39,7 +39,7 @@ namespace ADFSDump
         {
             Info.ShowInfo();
 
-            Dictionary<string, string> arguments = null;
+            Dictionary<string, string> arguments = new Dictionary<string, string>();
             if (args.Length > 0) arguments = ParseArgs(args);
 
             if (!arguments.ContainsKey("/nokey"))
