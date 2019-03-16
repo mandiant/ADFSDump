@@ -22,6 +22,10 @@ namespace ADFSDump
                     {
                         arguments[argument.Substring(0, index)] = argument.Substring(index + 1);
                     }
+                    else
+                    {
+                        arguments[argument] = "";
+                    }
                 }
             } catch (Exception)
             {
@@ -38,9 +42,11 @@ namespace ADFSDump
             Dictionary<string, string> arguments = null;
             if (args.Length > 0) arguments = ParseArgs(args);
 
-
-            ADSearcher.GetPrivKey(arguments);
-   
+            if (!arguments.ContainsKey("/nokey"))
+            {
+                ADSearcher.GetPrivKey(arguments);
+            }
+            
 
             Dictionary<string, RelyingParty>.ValueCollection rps = DatabaseReader.ReadConfigurationDb();
             if (rps == null)

@@ -60,6 +60,14 @@ namespace ADFSDump.ReadDB
             
         }
 
+        public static string SafeGetString(this SqlDataReader reader, string colName)
+        {
+            int colIndex = reader.GetOrdinal(colName);
+            if (!reader.IsDBNull(colIndex))
+                return reader.GetString(colIndex);
+            return string.Empty;
+        }
+
         private static string GetAdfsVersion(SqlConnection conn)
         {
             SqlDataReader reader = null;
@@ -138,10 +146,11 @@ namespace ADFSDump.ReadDB
                         break;
                     case Adfs2019:
                         Console.WriteLine("[-] Detected AD FS 2019");
+                        Console.WriteLine("[-] Uncharted territory! This might not work...");
                         readScopePolicies = string.Format(ReadScopePolicies, dbName);
                         break;
                     default:
-                        Console.WriteLine("!!! Couldn't determine AD FS version. Quitting");
+                        Console.WriteLine("!!! Couldn't determine AD FS version. Found database {0}.\n Quitting", dbName);
                         break;
                 }
                 
@@ -158,42 +167,42 @@ namespace ADFSDump.ReadDB
             while (reader.Read())
             {
  
-                string name = (string)reader["Name"];
+                string name = reader.SafeGetString("Name");
                 if (!BuiltInScopes.Any(name.Contains))
                 {
 
                     string scopeId = reader["ScopeId"].ToString();
                     RelyingParty rp = new RelyingParty { Name = name, Id = scopeId };
                     rp.IsEnabled = (bool)reader["Enabled"];
-                    rp.SignatureAlgorithm = (string)reader["SignatureAlgorithm"];
+                    rp.SignatureAlgorithm = reader.SafeGetString("SignatureAlgorithm");
                     if (dbName != Adfs2012R2)
                     {
-                        rp.AccessPolicy = (string)reader["PolicyMetadata"];
+                        rp.AccessPolicy = reader.SafeGetString("PolicyMetadata");
                         if (!reader.IsDBNull(9))
                         {
-                            rp.AccessPolicyParam = (string)reader["ParameterInterface"];
+                            rp.AccessPolicyParam = reader.SafeGetString("ParameterInterface");
                         }
  
                     }
                     
-                    rp.Identity = (string)reader["IdentityData"];
+                    rp.Identity = reader.SafeGetString("IdentityData");
 
                     if (!reader.IsDBNull(2))
                     {
                         rp.IsSaml = false;
                         rp.IsWsFed = true;
-                        rp.FederationEndpoint = (string)reader["WSFederationPassiveEndpoint"];
+                        rp.FederationEndpoint = reader.SafeGetString("WSFederationPassiveEndpoint");
                     }
                     else
                     {
                         rp.IsSaml = true;
                         rp.IsWsFed = false;
-                        rp.FederationEndpoint = (string)reader["Location"];
+                        rp.FederationEndpoint = reader.SafeGetString("Location");
                     }
 
                     if (!reader.IsDBNull(6))
                     {
-                        rp.EncryptionCert = (string)reader["EncryptionCertificate"];
+                        rp.EncryptionCert = reader.SafeGetString("EncryptionCertificate");
                     }
 
                     rp.SamlResponseSignatureType = (int) reader["SamlResponseSignatureType"];
@@ -219,7 +228,7 @@ namespace ADFSDump.ReadDB
             {
 
                 string scopeId = reader["ScopeId"].ToString();
-                string rule = (string)reader["PolicyData"];
+                string rule = reader.SafeGetString("PolicyData");
                 if (rps.Keys.Contains(scopeId) && !string.IsNullOrEmpty(rule))
                 {
 
