@@ -15,7 +15,7 @@ namespace ADFSDump.ActiveDirectory
             string domain = "";
             string server = "";
             string searchString = "";
-            if(arguments == null)
+            if(!arguments.ContainsKey("/domain"))
             {
                 //no domain or server given, try to find it ourselves
                 domain = System.DirectoryServices.ActiveDirectory.Domain.GetCurrentDomain().Name;
