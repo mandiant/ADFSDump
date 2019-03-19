@@ -127,6 +127,15 @@ namespace ADFSDump.ReadDB
                     XmlNode encryptedPfx = signingToken.GetElementsByTagName("EncryptedPfx")[0];
                     Console.WriteLine("[-] Encrypted Token Signing Key Begin\r\n{0}\r\n[-] Encrypted Token Signing Key End\r\n", encryptedPfx.InnerText);
                 }
+
+                Console.WriteLine("## Reading The Issuer Identifier");
+
+                XmlElement issuer = root.GetElementsByTagName("Issuer")[0] as XmlElement;
+                if (issuer != null)
+                {
+                    XmlNode issuerAddress = issuer.GetElementsByTagName("Address")[0];
+                    Console.WriteLine("[-] Issuer Identifier: {0}", issuerAddress.InnerText);
+                }
             }
             reader.Close();
 

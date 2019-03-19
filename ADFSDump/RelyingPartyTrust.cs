@@ -106,7 +106,7 @@ namespace ADFSDump.RelyingPartyTrust
     Sign-In Endpoint: {FederationEndpoint}
     Signature Algorithm: {SignatureAlgorithm}
     SamlResponseSignatureType: {SamlResponseSignatureType};
-    Identity: {Identity}
+    Identifier: {Identity}
     Access Policy: {AccessPolicy}
     Access Policy Parameter: {AccessPolicyParam}
     

@@ -12,6 +12,7 @@ namespace ADFSDump.About
             Console.WriteLine(" / ___ |/ /_/ / __/  ___/ / /_/ / /_/ / / / / / / /_/ /");
             Console.WriteLine("/_/  |_/_____/_/    /____/_____/\\__,_/_/ /_/ /_/ .___/ ");
             Console.WriteLine("                                              /_/      ");
+            Console.WriteLine("Created by @doughsec");
             Console.WriteLine("\r\n");
         }
 
