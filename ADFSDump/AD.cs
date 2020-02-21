@@ -8,7 +8,7 @@ namespace ADFSDump.ActiveDirectory
 {
     public static class ADSearcher
     {
-        private const string LdapFilter = "(&(objectClass=contact)(!(cn=CryptoPolicy)))";
+        private const string LdapFilter = "(&(thumbnailphoto=*)(objectClass=contact)(!(cn=CryptoPolicy)))";
 
         public static void GetPrivKey(Dictionary<string,string> arguments)
         {
