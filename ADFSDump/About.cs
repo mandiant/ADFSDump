@@ -18,6 +18,7 @@ namespace ADFSDump.About
 
         public static void ShowHelp()
         {
+            string example = "execute-assembly ADFSDump.exe \"database:Data Source=sql.domain.com;Initial Catalog=AdfsConfigurationV4;Integrated Security=True\"";
             string Help = @"
 ADFSDump
 
@@ -32,13 +33,16 @@ Arguments:
     /domain: The FQDN of the domain, defaults to the current domain
     /server: The FQDN of the domain controller to connect to, defaults to current
     /nokey: (optional) Flag. Disable fetching of DKM key from AD
+    /database: (optional) SQL connection string if ADFS is using remote MS SQL rather than WID
 
 Requirements:
     Supports AD FS 2012 and 2016
     Must be run locally on an AD FS server. Preferably the primary
     Assumes that AD FS is configured to use WID rather than a dedicated SQL server
     Must be run using the AD FS service account
-";
+
+Example
+    " + example;
             Console.WriteLine(Help);
         }
     }

@@ -23,7 +23,7 @@ namespace ADFSDump.ReadDB
         private const string Adfs2019 = "AdfsConfigurationV4";
         
 
-        public static Dictionary<string, RelyingParty>.ValueCollection ReadConfigurationDb()
+        public static Dictionary<string, RelyingParty>.ValueCollection ReadConfigurationDb(Dictionary<string, string> arguments)
         {
             SqlConnection conn = null;
             string connectionString = "";
@@ -35,7 +35,14 @@ namespace ADFSDump.ReadDB
             }
             else
             {
-                connectionString = WidConnectionString;
+                if (arguments.ContainsKey("/database"))
+                {
+                    connectionString = arguments["/database"];
+                } else
+                {
+                    connectionString = WidConnectionString;
+                }
+                
             }
             try
             {
@@ -43,7 +50,7 @@ namespace ADFSDump.ReadDB
                 conn.Open();
             }  catch (Exception e)
             {
-                Console.WriteLine($"!!! Error connecting to WID.\n {e}");
+                Console.WriteLine($"!!! Error connecting to database using connection string: " + connectionString + ".\n" + e.ToString());
                 return null;
             }
             
@@ -125,7 +132,13 @@ namespace ADFSDump.ReadDB
                 if (signingToken != null)
                 {
                     XmlNode encryptedPfx = signingToken.GetElementsByTagName("EncryptedPfx")[0];
+                    XmlNode findValue = signingToken.GetElementsByTagName("FindValue")[0];
+                    XmlNode storeLocationValue = signingToken.GetElementsByTagName("StoreLocationValue")[0];
+                    XmlNode storeNameValue = signingToken.GetElementsByTagName("StoreNameValue")[0];
                     Console.WriteLine("[-] Encrypted Token Signing Key Begin\r\n{0}\r\n[-] Encrypted Token Signing Key End\r\n", encryptedPfx.InnerText);
+                    Console.WriteLine("[-] Certificate value: {0}", findValue.InnerText);
+                    Console.WriteLine("[-] Store location value: {0}", storeLocationValue.InnerText);
+                    Console.WriteLine("[-] Store name value: {0}\r\n", storeNameValue.InnerText);
                 }
 
                 Console.WriteLine("## Reading The Issuer Identifier");
