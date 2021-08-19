@@ -28,6 +28,7 @@ ADFSDump is a tool that will read information from Active Directory and from the
 * `/domain:`: The Active Directory domain to target. Defaults to the current domain.
 * `/server:`: The Domain Controller to target. Defaults to the current DC.
 * `/nokey`: Switch. Toggle to disable outputting the DKM key.
+* `/database`:  (optional) SQL connection string if ADFS is using remote MS SQL rather than WID. Wrap in quotes, i.e. "/database:Data Source=sql.domain.com;Initial Catalog=AdfsConfigurationV4;Integrated Security=True"
 
 ## Compilation Instrucrtions
 
@@ -37,6 +38,6 @@ A compiled version will not be released. You'll have to compile it yourself!
 
 ### Targeting Other .NET Versions
 
-ADFSDump's default build configuration is for .NET 4.5, which will fail on systems without that version installed. To target ADFSDump for .NET 4 or 3.5, open the .sln solution, go to Project -> Rubeus Properties and change the "Target framework" to another version.
+ADFSDump's default build configuration is for .NET 4.5, which will fail on systems without that version installed. To target ADFSDump for .NET 4 or 3.5, open the .sln solution, go to Project -> ADFSDump Properties and change the "Target framework" to another version.
 
 Note that AD FS requires .NET framework 4.5, so I'm not sure why you need to use a different version anyway :wink:

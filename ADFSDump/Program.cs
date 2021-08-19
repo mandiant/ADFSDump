@@ -16,7 +16,7 @@ namespace ADFSDump
             try
             {
                 foreach(string argument in args)
-                {
+                {                 
                     var index = argument.IndexOf(":", StringComparison.Ordinal);
                     if (index > 0)
                     {
@@ -27,7 +27,7 @@ namespace ADFSDump
                         arguments[argument] = "";
                     }
                 }
-            } catch (Exception)
+            } catch (Exception e)
             {
                Info.ShowHelp();
                Environment.Exit(1);
@@ -38,7 +38,6 @@ namespace ADFSDump
         static void Main(string[] args)
         {
             Info.ShowInfo();
-
             Dictionary<string, string> arguments = new Dictionary<string, string>();
             if (args.Length > 0) arguments = ParseArgs(args);
 
@@ -47,8 +46,8 @@ namespace ADFSDump
                 ADSearcher.GetPrivKey(arguments);
             }
             
-
-            Dictionary<string, RelyingParty>.ValueCollection rps = DatabaseReader.ReadConfigurationDb();
+            Dictionary<string, RelyingParty>.ValueCollection rps = DatabaseReader.ReadConfigurationDb(arguments);
+            
             if (rps == null)
             {
                 Environment.Exit(1);
