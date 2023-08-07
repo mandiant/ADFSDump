@@ -29,8 +29,10 @@ ADFSDump is a tool that will read information from Active Directory and from the
 * `/server:`: The Domain Controller to target. Defaults to the current DC.
 * `/nokey`: Switch. Toggle to disable outputting the DKM key.
 * `/database`:  (optional) SQL connection string if ADFS is using remote MS SQL rather than WID. Wrap in quotes, i.e. "/database:Data Source=sql.domain.com;Initial Catalog=AdfsConfigurationV4;Integrated Security=True"
+* `/username`: (optional) Username to run the tool as. If set, must have a password passed with it.
+* `/password`: (optional) Password for the user account to run the tool as.
 
-## Compilation Instrucrtions
+## Compilation Instructions
 
 A compiled version will not be released. You'll have to compile it yourself!
 
